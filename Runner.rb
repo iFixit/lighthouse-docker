@@ -1,11 +1,11 @@
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
-   def initialize args
-      @output_directory = args['<output_directory>']
-      @endpoint_name = args['<endpoint_name>']
-      @url = args['<URL>']
-      @output_format = (args['--html'] ? 'html' : 'json')
+   def initialize output_format, output_directory, endpoint_name, url
+      @output_format = output_format
+      @output_directory = output_directory
+      @endpoint_name = endpoint_name
+      @url = url
    end
 
    def run

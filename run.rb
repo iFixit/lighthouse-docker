@@ -17,4 +17,9 @@ DOCOPT
 
 log :info, "Running Lighthouse against '#{args["<URL>"]}'"
 
-runner = LighthouseRunner.new(args).run
+output_format = (args['--html'] ? 'html' : 'json')
+output_directory = args['<output_directory>']
+endpoint_name = args['<endpoint_name>']
+url = args['<URL>']
+
+LighthouseRunner.new(output_format, output_directory, endpoint_name, url).run
