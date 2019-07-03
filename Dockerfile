@@ -8,5 +8,5 @@ RUN dnf install -y \
 
 WORKDIR /opt/lighthouse
 VOLUME /var/lighthouse
-COPY run.sh .
-ENTRYPOINT [ "/opt/lighthouse/run.sh" ]
+
+ENTRYPOINT [ "/usr/bin/lighthouse" ]
