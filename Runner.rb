@@ -1,8 +1,9 @@
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
-   def initialize output_format, output_directory, endpoint_name, url
+   def initialize output_format, output_format_options, output_directory, endpoint_name, url
       @output_format = output_format
+      @output_format_options = output_format_options
       @output_directory = output_directory
       @endpoint_name = endpoint_name
       @url = url
@@ -16,7 +17,7 @@ class LighthouseRunner
          -v #{absolute_output_path}:/var/lighthouse/:z \
          lighthouse \
          --chrome-flags='--headless --no-sandbox' \
-         --output #{@output_format} \
+         #{@output_format_options} \
          --output-path "#{internal_output_path}" \
          "#{@url}"
       DOCKER_RUN
@@ -27,7 +28,7 @@ class LighthouseRunner
    private
 
    def internal_output_path
-      return "#{INTERNAL_ROOT}/#{@endpoint_name}.#{@output_format}"
+      return "#{INTERNAL_ROOT}/#{@endpoint_name}#{@output_format}"
    end
 
    def absolute_output_path
