@@ -1,3 +1,5 @@
+require 'shellwords'
+
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
@@ -14,7 +16,7 @@ class LighthouseRunner
       docker_run_cmd = <<~DOCKER_RUN
          docker run \
          --rm \
-         -v "#{absolute_output_path}:/var/lighthouse/:z" \
+         -v #{absolute_output_path}:/var/lighthouse/:z \
          lighthouse \
          --chrome-flags='--headless --no-sandbox' \
          #{@output_format_options} \
@@ -32,6 +34,6 @@ class LighthouseRunner
    end
 
    def absolute_output_path
-      return File.expand_path(@output_directory)
+      return File.expand_path(@output_directory).shellescape
    end
 end
