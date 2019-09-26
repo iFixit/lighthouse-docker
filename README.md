@@ -6,10 +6,7 @@ This is a handy wrapper layer that allow for running
 
 ### Setup
 
-Build the docker image
-```
-docker build . --tag lighthouse:latest
-```
+Run the install script, `install.sh`.
 
 ### Usage
 ```
