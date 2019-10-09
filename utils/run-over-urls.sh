@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# Purpose: run lighthouse on list of URLs
+# I tested this on a list of URLs derived from a sitemap
+
 i=0
 for url in $(cat urls/URLs.txt)
 do
