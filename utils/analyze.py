@@ -1,5 +1,7 @@
 import json
 
+# Parse out scores from lighthouse json output
+
 f = open('output0.json')
 
 j = json.load(f)
