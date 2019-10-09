@@ -1,5 +1,7 @@
 #!/usr/local/bin/python3
 
+# Used to crawl a sitemap for URLs located in `loc` elements
+
 import xml.etree.ElementTree as ET
 import sys
 
