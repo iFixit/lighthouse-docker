@@ -13,5 +13,6 @@ for auditId, auditObj in a.items():
   s = auditObj['score']
   if (sdm == 'binary' or sdm == 'numeric') and s < 1:
     print(auditId)
+    print(auditObj['title'])
     print(auditObj['scoreDisplayMode'])
     print(auditObj['score'])
