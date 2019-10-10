@@ -29,7 +29,7 @@ class LighthouseRunner
    private
 
    def internal_output_path
-      return "#{INTERNAL_ROOT}/#{@endpoint_name.gsub(/\//, '%2F')}#{@output_format}"
+      return "#{INTERNAL_ROOT}/#{@endpoint_name}#{@output_format}"
    end
 
    def absolute_output_path
