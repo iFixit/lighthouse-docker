@@ -16,8 +16,9 @@ class LighthouseRunner
          --rm \
          -v #{absolute_output_path}:/var/lighthouse/:z \
          lighthouse \
+         --only-categories=accessibility \
          --chrome-flags='--headless --no-sandbox' \
-         #{@output_format_options} \
+         --output=json --output=html \
          --output-path "#{internal_output_path}" \
          "#{@url}"
       DOCKER_RUN
