@@ -8,7 +8,7 @@ args = parse_args <<DOCOPT
 Lighthouse Runner
 
 Usage:
-  #{File.basename __FILE__} [--html] <output_directory> <endpoint_name> <URL>
+  #{File.basename __FILE__} [--html] <output_directory> <endpoint_name> <URL> <session_token>
 
 Options:
   --html              Generate HTML format report
@@ -22,5 +22,6 @@ output_format = (args['--html'] ? '' : '.json')
 output_directory = args['<output_directory>']
 endpoint_name = args['<endpoint_name>']
 url = args['<URL>']
+session_token = args['<session_token>']
 
-LighthouseRunner.new(output_format, output_format_options, output_directory, endpoint_name, url).run
+LighthouseRunner.new(output_format, output_format_options, output_directory, endpoint_name, url, session_token).run

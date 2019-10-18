@@ -1,12 +1,13 @@
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
-   def initialize output_format, output_format_options, output_directory, endpoint_name, url
+   def initialize output_format, output_format_options, output_directory, endpoint_name, url, session_token
       @output_format = output_format
       @output_format_options = output_format_options
       @output_directory = output_directory
       @endpoint_name = endpoint_name
       @url = url
+      @session_token = session_token
    end
 
    def run
@@ -19,6 +20,7 @@ class LighthouseRunner
          --chrome-flags='--headless --no-sandbox' \
          #{@output_format_options} \
          --output-path "#{internal_output_path}" \
+				 #{extra_headers} \
          "#{@url}"
       DOCKER_RUN
       log :debug, docker_run_cmd
@@ -33,5 +35,13 @@ class LighthouseRunner
 
    def absolute_output_path
       return File.expand_path(@output_directory)
+   end
+
+	 def extra_headers
+      if @session_token then
+        return "--extra-headers=\"{\\\"Cookie\\\": \\\"session_4813=#{@session_token}\\\"}\""
+      else
+        return ""
+      end
    end
 end
