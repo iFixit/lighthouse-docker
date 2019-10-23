@@ -1,7 +1,7 @@
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
-   def initialize output_format, output_format_options, output_directory, endpoint_name, url, session_token
+   def initialize output_format, output_format_options, output_directory, endpoint_name, url, session_token = nil
       @output_format = output_format
       @output_format_options = output_format_options
       @output_directory = output_directory
