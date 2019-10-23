@@ -39,7 +39,7 @@ class LighthouseRunner
 
 	 def extra_headers
       if @session_token then
-        return "--extra-headers=\"{\\\"Cookie\\\": \\\"session_4813=#{@session_token}\\\"}\""
+        return %Q[--extra-headers='{"Cookie": "session_4813=#{@session_token}"}']
       else
         return ""
       end
