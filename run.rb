@@ -22,6 +22,6 @@ output_format = (args['--html'] ? '' : '.json')
 output_directory = args['<output_directory>']
 endpoint_name = args['<endpoint_name>']
 url = args['<URL>']
-session_token = args['<session_token>'] || nil
+session_token = args['<session_token>']
 
 LighthouseRunner.new(output_format, output_format_options, output_directory, endpoint_name, url, session_token).run
