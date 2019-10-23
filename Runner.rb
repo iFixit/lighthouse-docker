@@ -20,7 +20,7 @@ class LighthouseRunner
          --chrome-flags='--headless --no-sandbox' \
          #{@output_format_options} \
          --output-path "#{internal_output_path}" \
-             #{extra_headers} \
+         #{extra_headers} \
          "#{@url}"
       DOCKER_RUN
       log :debug, docker_run_cmd
