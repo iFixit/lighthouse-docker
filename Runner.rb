@@ -20,7 +20,7 @@ class LighthouseRunner
          --chrome-flags='--headless --no-sandbox' \
          #{@output_format_options} \
          --output-path "#{internal_output_path}" \
-				 #{extra_headers} \
+             #{extra_headers} \
          "#{@url}"
       DOCKER_RUN
       log :debug, docker_run_cmd
@@ -37,11 +37,11 @@ class LighthouseRunner
       return File.expand_path(@output_directory)
    end
 
-	 def extra_headers
+   def extra_headers
       if @session_token then
-        return %Q[--extra-headers='{"Cookie": "session_4813=#{@session_token}"}']
+         return %Q[--extra-headers='{"Cookie": "session_4813=#{@session_token}"}']
       else
-        return ""
+         return ""
       end
    end
 end
