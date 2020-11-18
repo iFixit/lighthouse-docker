@@ -7,6 +7,6 @@ services:
   - docker
 
 script:
-  - docker build -t lighthouse .
+  - sh install.sh
   - ruby run.rb . example.com http://example.com
 
