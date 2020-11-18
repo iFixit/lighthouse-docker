@@ -1,7 +1,6 @@
 language: ruby
 
 os:
-  - osx
   - linux
 
 services:
