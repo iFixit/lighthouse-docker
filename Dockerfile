@@ -12,4 +12,4 @@ RUN npm install lighthouse \
 
 VOLUME /var/lighthouse
 
-ENTRYPOINT [ "/usr/bin/npx", "lighthouse" ]
+ENTRYPOINT [ "npx", "lighthouse" ]
