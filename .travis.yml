@@ -5,8 +5,5 @@ services:
 
 script:
   - docker build -t lighthouse .
-  - gem install scriptster
-
-after_script:
   - ruby run.rb . example.com http://example.com
 
