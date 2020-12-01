@@ -11,18 +11,18 @@ class LighthouseRunner
 
    def run
       log :info, "Saving results into: '#{absolute_output_path}'"
-      docker_run_cmd = <<~DOCKER_RUN
-         docker run \
-         --rm \
-         -v #{absolute_output_path}:/var/lighthouse/:z \
-         lighthouse \
-         --chrome-flags='--headless --no-sandbox' \
-         #{@output_format_options} \
-         --output-path "#{internal_output_path}" \
-         "#{@url}"
-      DOCKER_RUN
-      log :debug, docker_run_cmd
-      cmd docker_run_cmd, {show_out: true, out_level: :info}
+      args = [
+        'docker', 'run',
+        '--rm',
+        '-v', "#{absolute_output_path}:/var/lighthouse/:z",
+        'lighthouse',
+        "--chrome-flags='--headless --no-sandbox'",
+        *@output_format_options,
+        '--output-path', internal_output_path,
+        @url
+      ]
+      log(:info, args.join(' '))
+      system(*args)
    end
 
    private
