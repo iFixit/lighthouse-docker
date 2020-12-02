@@ -22,7 +22,7 @@ class LighthouseRunner
         @url
       ]
       log(:info, args.join(' '))
-      system(*args)
+      system(*args) or exit(70) # BSD's EX_SOFTWARE exit code
    end
 
    private
