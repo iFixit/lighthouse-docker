@@ -17,6 +17,7 @@ class LighthouseRunner
         '-v', "#{absolute_output_path}:/var/lighthouse/:z",
         'lighthouse',
         "--chrome-flags='--headless --no-sandbox'",
+        "--only-categories=accessibility,best-practices,performance,seo",
         *@output_format_options,
         '--output-path', internal_output_path,
         @url
