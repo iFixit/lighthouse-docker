@@ -11,13 +11,17 @@ class LighthouseRunner
 
    def run
       log :info, "Saving results into: '#{absolute_output_path}'"
+      config_path = File.join(__dir__, "lighthouse-config.js")
+      internal_config_path = '/var/lighthouse-config.js'
       args = [
         'docker', 'run',
         '--rm',
         '-v', "#{absolute_output_path}:/var/lighthouse/:z",
+        '-v', "#{config_path}:#{internal_config_path}",
         'lighthouse',
         "--chrome-flags='--headless --no-sandbox'",
         "--only-categories=accessibility,best-practices,performance,seo",
+        '--config-path', internal_config_path,
         *@output_format_options,
         '--output-path', internal_output_path,
         @url
