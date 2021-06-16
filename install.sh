@@ -2,4 +2,4 @@
 
 docker build -t lighthouse lighthouse-docker
 
-gem install scriptster
+gem install docopt
