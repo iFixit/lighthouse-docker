@@ -7,11 +7,12 @@ library(magrittr)
 devtools::install_local("./webperf/", upgrade="never")
 library(webperf)
 
-setwd("target_directory/")
+# Change the following directory to switch to your results directory
+setwd("results/")
 
 # Change the vector of `www` and `dev` below to have all the prefix names from
 # your lighthouse run.
-specs <- webperf::read_lighthouse_json(c("www", "dev"), 10)
+specs <- webperf::read_lighthouse_json(c("www", "dev"), 3)
 
 # Analyze key performance metrics
 specs %>% webperf::analyze_change(largestContentfulPaint)
