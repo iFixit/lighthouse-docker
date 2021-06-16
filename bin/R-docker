@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+require 'docopt'
+
+class DockerRunner
+  def initialize(image: 'rocker/verse')
+    @image = image
+  end
+
+  def docker(port, *args)
+    system('docker', 'run', '--rm', '-p', port, '-v',
+           "#{Dir.getwd}:/home/rstudio", *args, @image) or raise 'Docker run error'
+  end
+end
+
+opts = Docopt.docopt <<~DOCS
+  Usage:
+    R-docker [options]
+
+  Options:
+    --use-pass       Use a randomly-generated password
+    --port=<port>    Expose on specified port [default: 8787]
+    --image=<image>  Use this Docker image [default: rocker/verse]
+DOCS
+
+port = opts['--port']
+runner = DockerRunner.new(
+  image: opts['--image']
+)
+
+if opts['--use-pass']
+  password = `apg -n1 -ML`
+  puts "Password\n#{password}"
+  runner.docker("#{port}:8787", "-ePASSWORD=#{password}")
+else
+  Thread.new do
+    sleep 2
+    system 'xdg-open', "http://localhost:#{port}"
+  end
+  runner.docker("127.0.0.1:#{port}:8787", '-eDISABLE_AUTH=true')
+end
