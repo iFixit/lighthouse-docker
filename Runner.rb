@@ -1,3 +1,5 @@
+require 'shellwords'
+
 class LighthouseRunner
    INTERNAL_ROOT = '/var/lighthouse'
 
@@ -33,6 +35,6 @@ class LighthouseRunner
    end
 
    def absolute_output_path
-      return File.expand_path(@output_directory)
+      return File.expand_path(@output_directory).shellescape
    end
 end

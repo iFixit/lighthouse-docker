@@ -4,6 +4,10 @@ A Docker container for Lighthouse (i.e., https://github.com/GoogleChrome/lightho
 
 This is a handy wrapper layer that allow for running
 
+### Setup
+
+Run the install script, `install.sh`.
+
 ### Usage
 ```
 Usage:                                                    
