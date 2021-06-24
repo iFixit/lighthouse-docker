@@ -2,7 +2,6 @@
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
 require 'pathname'
-require 'json'
 
 require 'docopt'
 

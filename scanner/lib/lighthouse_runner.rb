@@ -1,3 +1,4 @@
+require 'json'
 require 'lib/scan_output'
 require 'logger'
 require 'uri'
