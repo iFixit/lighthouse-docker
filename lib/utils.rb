@@ -58,9 +58,9 @@ module ExecHelpers
     pid = spawn(*args)
     begin
       Timeout.timeout(LIGHTHOUSE_TIMEOUT) do
-        Process.wait(pid)
+        pid, status = Process.wait2(pid)
+        return status.success?
       end
-      true
     rescue Timeout::Error
       Log.warn "Timeout; killing pid #{pid}"
       Process.kill(15, pid)
