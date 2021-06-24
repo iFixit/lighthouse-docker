@@ -4,7 +4,7 @@ require 'docopt'
 
 require 'logger'
 
-log = Logger.new($stderr)
+Log = Logger.new($stderr)
 
 def main
   args = Docopt.docopt <<~DOCOPT
@@ -18,7 +18,7 @@ def main
       -h, --help          Show this message.
   DOCOPT
 
-  log.info "Running Lighthouse against '#{args['<URL>']}'"
+  Log.info "Running Lighthouse against '#{args['<URL>']}'"
 
   output_format_options = if args['--html']
                             ['--output', 'html', '--output', 'json']
@@ -45,7 +45,7 @@ class LighthouseRunner
   end
 
   def run
-    log.info "Saving results into: '#{absolute_output_path}'"
+    Log.info "Saving results into: '#{absolute_output_path}'"
     args = [
       'docker', 'run',
       '--rm',
@@ -57,7 +57,7 @@ class LighthouseRunner
       '--output-path', internal_output_path,
       @url
     ]
-    log.info args.join(' ')
+    Log.info args.join(' ')
     system(*args) or exit(70) # BSD's EX_SOFTWARE exit code
   end
 
