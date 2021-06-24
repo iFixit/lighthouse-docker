@@ -17,7 +17,7 @@ CONFIG_FILE_NAME = 'lighthouse-config.js'
 CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
 
 def docker_lighthouse(url, target)
-  lighthouse(
+  Lighthouse.run(
     Dir.pwd,
     target,
     url.to_s,
@@ -107,7 +107,7 @@ def run_scan(pairs, requests)
   # Try up to ten times, waiting up to four minutes for a reply from the server
   pairs.shuffle.each do |_env, url|
     Log.info "Checking if #{url} is ready"
-    run 'curl', '--max-time', (4 * 60).to_s, '--retry', '10', url.to_s, out: '/dev/null'
+    ExecHelpers.run 'curl', '--max-time', (4 * 60).to_s, '--retry', '10', url.to_s, out: '/dev/null'
     lighthouse url, 'warmup.json'
   end
   sleep 5
