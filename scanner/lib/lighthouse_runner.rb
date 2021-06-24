@@ -1,5 +1,5 @@
 require 'lib/scan_output'
-require 'lib/config_reader'
+require 'lib/framework'
 require 'lib/index'
 require_relative '../../lib/utils'
 
@@ -35,7 +35,14 @@ class LighthouseRunner
   end
 
   def frameworks
-    @config_reader = ConfigReader.new
-    @config_reader.frameworks(@config_file_path, @hostname)
+    _frameworks(@config_file_path, @hostname)
+  end
+
+  def _frameworks(config_file_path, hostname = nil)
+    config_contents = JSON.load(config_file_path)
+    log :debug, "Read config file: '#{config_file_path}'"
+    config_contents.map do |framework, pages|
+      Framework.new framework, pages, hostname
+    end
   end
 end
