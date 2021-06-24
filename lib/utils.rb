@@ -52,12 +52,16 @@ module ExecHelpers
     end
   end
 
-  LIGHTHOUSE_TIMEOUT = 4 * 60
+  # For testing, this is a variable
+  @lighthouse_timeout = 4 * 60
+  def self.lighthouse_timeout=(val)
+    @lighthouse_timeout = val
+  end
 
   def self.limited_system(*args)
     pid = spawn(*args)
     begin
-      Timeout.timeout(LIGHTHOUSE_TIMEOUT) do
+      Timeout.timeout(@lighthouse_timeout) do
         pid, status = Process.wait2(pid)
         return status.success?
       end
