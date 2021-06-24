@@ -49,9 +49,7 @@ module ExecHelpers
   Log = Logger.new($stderr, progname: 'Lighthouse')
 
   def self.run(*args)
-    unless system(*args)
-      raise "Command exited with exit status of #{$CHILD_STATUS}"
-    end
+    raise "Command exited with exit status of #{$CHILD_STATUS}" unless system(*args)
   end
 
   # For testing, this is a variable
