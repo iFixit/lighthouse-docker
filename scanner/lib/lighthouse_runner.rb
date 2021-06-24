@@ -15,7 +15,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    _frameworks(@config_file_path, @hostname).each do |framework|
+    frameworks(@config_file_path, @hostname).each do |framework|
       framework_dir = @output.get_framework_dir(framework.name)
       framework.pages.each do |page|
         @index.add framework.name, page.name
@@ -34,11 +34,7 @@ class LighthouseRunner
     )
   end
 
-  def frameworks
-    _frameworks(@config_file_path, @hostname)
-  end
-
-  def _frameworks(config_file_path, hostname = nil)
+  def frameworks(config_file_path, hostname = nil)
     config_contents = JSON.load(config_file_path)
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.map do |framework, pages|
