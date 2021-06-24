@@ -1,6 +1,9 @@
 require 'English'
+require 'logger'
 
 module Lighthouse
+  Log = Logger.new($stderr, progname: 'Lighthouse')
+
   def self.run(
     bind_path,
     target,
