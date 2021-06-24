@@ -35,7 +35,7 @@ class LighthouseRunner
   end
 
   def frameworks
-    @config_reader = ConfigReader.new(@config_file_path, @hostname)
-    @config_reader.frameworks
+    @config_reader = ConfigReader.new
+    @config_reader.frameworks(@config_file_path, @hostname)
   end
 end
