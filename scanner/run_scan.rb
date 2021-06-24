@@ -4,15 +4,15 @@ $LOAD_PATH.unshift File.dirname(__FILE__)
 require 'pathname'
 require 'json'
 
-require 'scriptster'
-include Scriptster
+require 'docopt'
 
 require 'fileutils'
 include FileUtils
 
 require 'lib/lighthouse_runner'
 
-args = parse_args <<~DOCOPT
+begin
+args = Docopt.docopt <<~DOCOPT
   Run an automated Lighthouse scan. Emit results into a target directory.
 
   Usage:
@@ -23,6 +23,10 @@ args = parse_args <<~DOCOPT
     --hostname=<hostname>  Replace the hostname specified in the config file [default: www.ifixit.com]
                            with the provided hostname
 DOCOPT
+rescue Docopt::Exit => e
+  puts e.message
+  exit
+end
 
 config_file_path = Pathname.new args['<config_file>']
 output_dir = Pathname.new args['<output_dir>']
