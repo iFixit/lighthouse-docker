@@ -7,8 +7,9 @@ require_relative '../../lib/utils'
 # Sets up runs of Lighthouse on multiple URLs
 class LighthouseRunner
   def initialize(config_file_path, output_dir, hostname)
+    @config_file_path = config_file_path
+    @hostname = hostname
     @output = ScanOutput.new(output_dir, hostname)
-    @config_reader = ConfigReader.new(config_file_path, hostname)
     @index = Index.new
   end
 
@@ -34,6 +35,7 @@ class LighthouseRunner
   end
 
   def frameworks
+    @config_reader = ConfigReader.new(@config_file_path, @hostname)
     @config_reader.frameworks
   end
 end
