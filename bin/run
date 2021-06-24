@@ -16,25 +16,16 @@ ROOT = Pathname(__dir__)
 CONFIG_FILE_NAME = 'lighthouse-config.js'
 CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
 
-def docker_lighthouse(url, target)
-  Lighthouse.run(
-    Dir.pwd,
-    target,
-    url.to_s,
-    '--output', 'json',
-    "--config-path=/var/lighthouse/#{CONFIG_FILE_NAME}"
-  )
-end
-
 def lighthouse(url, target)
   FileUtils.cp CONFIG_FILE, CONFIG_FILE_NAME
-  5.times do
-    # Exit the `lighthouse` function if the command succeeds
-    return if docker_lighthouse(url, target)
-
-    Log.error "Error running command. Exit status was #{$CHILD_STATUS}."
-  end
-  raise "Lighthouse failed five times for #{target}; was trying to load #{url}"
+  raise "Lighthouse failed five times for #{target}; was trying to load #{url}" unless
+    Lighthouse.run(
+      Dir.pwd,
+      target,
+      url.to_s,
+      '--output', 'json',
+      "--config-path=/var/lighthouse/#{CONFIG_FILE_NAME}"
+    )
 end
 
 $uniq_id = 0

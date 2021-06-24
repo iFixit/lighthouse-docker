@@ -1,3 +1,5 @@
+require 'English'
+
 module Lighthouse
   def self.run(
     bind_path,
@@ -5,12 +7,30 @@ module Lighthouse
     *args,
     chrome_flags: '--headless --no-sandbox'
   )
+    5.times do
+      # Exit the `lighthouse` function if the command succeeds
+      return true if run_once(
+        bind_path,
+        target,
+        *args,
+        '--chrome-flags', chrome_flags
+      )
+
+      Log.error "Error running command. Exit status was #{$CHILD_STATUS}."
+    end
+    false
+  end
+
+  def self.run_once(
+    bind_path,
+    target,
+    *args
+  )
     docker_args = [
       'docker', 'run',
       '--rm',
       '-v', "#{bind_path}:/var/lighthouse/:z",
       'lighthouse',
-      '--chrome-flags', chrome_flags,
       '--output-path', target,
       *args
     ]
