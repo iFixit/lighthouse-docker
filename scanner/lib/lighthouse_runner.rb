@@ -14,7 +14,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    @config_reader.frameworks.each do |framework|
+    frameworks.each do |framework|
       framework_dir = @output.get_framework_dir(framework.name)
       framework.pages.each do |page|
         @index.add framework.name, page.name
@@ -31,5 +31,9 @@ class LighthouseRunner
       target_url.to_s,
       '--output', 'html'
     )
+  end
+
+  def frameworks
+    @config_reader.frameworks
   end
 end
