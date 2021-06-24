@@ -8,38 +8,22 @@ require 'uri'
 require 'cgi'
 require 'English'
 require 'logger'
+require_relative '../lib/utils'
+
 Log = Logger.new($stderr)
 
 ROOT = Pathname(__dir__)
 CONFIG_FILE_NAME = 'lighthouse-config.js'
 CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
 
-def run(*args)
-  unless system(*args)
-    raise "Command exited with exit status of #{$CHILD_STATUS}"
-  end
-end
-
-def limited_system(*args)
-  pid = spawn(*args)
-  begin
-    Timeout.timeout(240) do
-      Process.wait(pid)
-    end
-    true
-  rescue StandardError
-    Log.warn "Timeout; killing pid #{pid}"
-    Process.kill(15, pid)
-    false
-  end
-end
-
 def docker_lighthouse(url, target)
-  limited_system 'docker', 'run', '--rm', "-v#{Dir.pwd}:/var/lighthouse/:z", 'lighthouse',
-                 url.to_s, '--output=json',
-                 "--config-path=/var/lighthouse/#{CONFIG_FILE_NAME}",
-                 '--chrome-flags="--headless --no-sandbox"',
-                 "--output-path=/var/lighthouse/#{target}"
+  lighthouse(
+    Dir.pwd,
+    target,
+    url.to_s,
+    '--output', 'json',
+    "--config-path=/var/lighthouse/#{CONFIG_FILE_NAME}"
+  )
 end
 
 def lighthouse(url, target)
