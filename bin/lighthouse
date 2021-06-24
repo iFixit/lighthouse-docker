@@ -1,22 +1,24 @@
 #!/usr/bin/env ruby
 
 require 'docopt'
-
 require 'logger'
+require 'pathname'
 
 Log = Logger.new($stderr)
 
+DOCS = <<~DOCOPT.freeze
+  Lighthouse Runner
+
+  Usage:
+    #{File.basename __FILE__} [--html] <output_directory> <endpoint_name> <URL>
+
+  Options:
+    --html              Generate HTML format report
+    -h, --help          Show this message.
+DOCOPT
+
 def main
-  args = Docopt.docopt <<~DOCOPT
-    Lighthouse Runner
-
-    Usage:
-      #{File.basename __FILE__} [--html] <output_directory> <endpoint_name> <URL>
-
-    Options:
-      --html              Generate HTML format report
-      -h, --help          Show this message.
-  DOCOPT
+  args = Docopt.docopt DOCS
 
   Log.info "Running Lighthouse against '#{args['<URL>']}'"
 
@@ -25,51 +27,43 @@ def main
                           else
                             ['--output', 'json']
                           end
-  output_format = (args['--html'] ? '' : '.json')
-  output_directory = args['<output_directory>']
-  endpoint_name = args['<endpoint_name>']
-  url = args['<URL>']
-
-  LighthouseRunner.new(output_format, output_format_options, output_directory, endpoint_name, url).run
+  run(
+    output_format_options,
+    args['<output_directory>'],
+    args['<endpoint_name>'],
+    args['<URL>']
+  )
 end
 
-class LighthouseRunner
-  INTERNAL_ROOT = '/var/lighthouse'.freeze
+INTERNAL_ROOT = Pathname('/var/lighthouse')
 
-  def initialize(output_format, output_format_options, output_directory, endpoint_name, url)
-    @output_format = output_format
-    @output_format_options = output_format_options
-    @output_directory = output_directory
-    @endpoint_name = endpoint_name
-    @url = url
-  end
+def run(
+  output_format_options,
+  output_directory,
+  endpoint_name,
+  url
+)
+  internal_output_path = INTERNAL_ROOT / endpoint_name
+  absolute_output_path = File.expand_path(output_directory)
+  Log.info "Saving results into: '#{absolute_output_path}'"
+  docker_lighthouse(absolute_output_path,
+                    "--chrome-flags='--headless --no-sandbox'",
+                    '--only-categories=accessibility,best-practices,performance,seo',
+                    *output_format_options,
+                    '--output-path', internal_output_path,
+                    url)
+end
 
-  def run
-    Log.info "Saving results into: '#{absolute_output_path}'"
-    args = [
-      'docker', 'run',
-      '--rm',
-      '-v', "#{absolute_output_path}:/var/lighthouse/:z",
-      'lighthouse',
-      "--chrome-flags='--headless --no-sandbox'",
-      '--only-categories=accessibility,best-practices,performance,seo',
-      *@output_format_options,
-      '--output-path', internal_output_path,
-      @url
-    ]
-    Log.info args.join(' ')
-    system(*args) or exit(70) # BSD's EX_SOFTWARE exit code
-  end
-
-  private
-
-  def internal_output_path
-    "#{INTERNAL_ROOT}/#{@endpoint_name}#{@output_format}"
-  end
-
-  def absolute_output_path
-    File.expand_path(@output_directory)
-  end
+def docker_lighthouse(bind_path, *args)
+  docker_args = [
+    'docker', 'run',
+    '--rm',
+    '-v', "#{bind_path}:/var/lighthouse/:z",
+    'lighthouse',
+    *args
+  ]
+  Log.info args.join(' ')
+  system(*docker_args) or exit(70) # BSD's EX_SOFTWARE exit code
 end
 
 main
