@@ -8,7 +8,7 @@ require_relative '../../lib/utils'
 ##
 # Sets up runs of Lighthouse on multiple URLs
 class LighthouseRunner
-  Log = Logger.new($stderr, "LighthouseRunner")
+  Log = Logger.new($stderr, 'LighthouseRunner')
   def initialize(config_file_path, output_dir, hostname)
     @config_file_path = config_file_path
     @hostname = hostname
@@ -51,7 +51,7 @@ class LighthouseRunner
     uri
   end
 
-  def generate_index pages
+  def generate_index(pages)
     framework_groups = pages.group_by(&:framework_name)
     index = framework_groups.transform_values { |group| group.map(&:name) }
 
