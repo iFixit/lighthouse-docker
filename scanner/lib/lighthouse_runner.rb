@@ -15,7 +15,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    frameworks.each do |framework|
+    _frameworks(@config_file_path, @hostname).each do |framework|
       framework_dir = @output.get_framework_dir(framework.name)
       framework.pages.each do |page|
         @index.add framework.name, page.name
