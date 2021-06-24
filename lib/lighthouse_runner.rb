@@ -27,7 +27,7 @@ class LighthouseRunner
   def run_scan(page)
     framework_dir = @output.get_framework_dir(page.framework_name)
     exit(70) unless Lighthouse.run(
-      framework_dir.to_path,
+      framework_dir.realpath.to_path,
       page.name,
       page.url.to_s,
       '--output', 'html'
