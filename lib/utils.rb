@@ -58,7 +58,7 @@ module ExecHelpers
         Process.wait(pid)
       end
       true
-    rescue StandardError
+    rescue Timeout::Error
       Log.warn "Timeout; killing pid #{pid}"
       Process.kill(15, pid)
       false
