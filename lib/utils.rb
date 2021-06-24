@@ -1,6 +1,7 @@
 require 'English'
 require 'logger'
 require 'pathname'
+require 'timeout'
 
 module Lighthouse
   Log = Logger.new($stderr, progname: 'Lighthouse')
