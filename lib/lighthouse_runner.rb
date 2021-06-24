@@ -30,7 +30,8 @@ class LighthouseRunner
       framework_dir.realpath.to_path,
       page.name,
       page.url.to_s,
-      '--output', 'html'
+      '--output', 'html',
+      '--output', 'json'
     )
   end
 
