@@ -16,7 +16,7 @@ module Lighthouse
         bind_path,
         target,
         *args,
-        '--chrome-flags', chrome_flags
+        "--chrome-flags=#{chrome_flags}"
       )
 
       Log.error "Error running command. Exit status was #{$CHILD_STATUS}."
