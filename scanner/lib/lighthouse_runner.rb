@@ -1,10 +1,12 @@
 require 'lib/scan_output'
+require 'logger'
 require 'uri'
 require_relative '../../lib/utils'
 
 ##
 # Sets up runs of Lighthouse on multiple URLs
 class LighthouseRunner
+  Log = Logger.new($stderr, "LighthouseRunner")
   def initialize(config_file_path, output_dir, hostname)
     @config_file_path = config_file_path
     @hostname = hostname
@@ -12,7 +14,7 @@ class LighthouseRunner
   end
 
   def run
-    log :info, 'Running Lighthouse scan'
+    Log.info('Running Lighthouse scan')
     pages = pages_from_config(@config_file_path)
     pages.each do |page|
       run_scan page
@@ -32,7 +34,7 @@ class LighthouseRunner
 
   def pages_from_config(config_file_path)
     config_contents = JSON.load(config_file_path)
-    log :debug, "Read config file: '#{config_file_path}'"
+    Log.debug("Read config file: '#{config_file_path}'")
 
     config_contents.flat_map do |framework, pages|
       pages.map do |name, url|
@@ -55,7 +57,7 @@ class LighthouseRunner
   end
 
   def write_index(index)
-    log :info, 'Generating index file'
+    Log.info('Generating index file')
     File.write(@output.scan_dir / 'index.json', JSON.dump(index))
   end
 end
