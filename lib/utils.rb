@@ -1,8 +1,10 @@
 require 'English'
 require 'logger'
+require 'pathname'
 
 module Lighthouse
   Log = Logger.new($stderr, progname: 'Lighthouse')
+  InternalPath = Pathname('/var/lighthouse/')
 
   def self.run(
     bind_path,
@@ -32,9 +34,9 @@ module Lighthouse
     docker_args = [
       'docker', 'run',
       '--rm',
-      '-v', "#{bind_path}:/var/lighthouse/:z",
+      '-v', "#{bind_path}:#{InternalPath}:z",
       'lighthouse',
-      '--output-path', target,
+      '--output-path', (InternalPath / target).to_path,
       *args
     ]
     Log.info docker_args.join(' ')
