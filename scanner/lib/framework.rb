@@ -8,13 +8,15 @@ class Framework
 
   def initialize(name, pages, hostname)
     @name = name
-    @pages = unpack_pages pages, hostname
+    @_pages = pages
+    @hostname = hostname
+    @pages = unpack_pages
   end
 
-  def unpack_pages(pages, hostname)
-    pages.map do |name, url|
+  def unpack_pages
+    @_pages.map do |name, url|
       uri = URI.parse url
-      uri.host = hostname if hostname
+      uri.host = @hostname if @hostname
       Page.new name, uri
     end
   end
