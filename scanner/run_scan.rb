@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
-$LOAD_PATH.unshift File.dirname(__FILE__)
 
 require 'pathname'
 
 require 'docopt'
 
-require 'lib/lighthouse_runner'
+require_relative 'lib/lighthouse_runner'
 
 begin
 args = Docopt.docopt <<~DOCOPT
