@@ -6,9 +6,6 @@ require 'json'
 
 require 'docopt'
 
-require 'fileutils'
-include FileUtils
-
 require 'lib/lighthouse_runner'
 
 begin
