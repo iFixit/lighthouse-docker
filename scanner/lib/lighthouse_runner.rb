@@ -32,16 +32,13 @@ class LighthouseRunner
     )
   end
 
-  def frameworks(config_file_path, hostname = nil)
+  def pages(config_file_path, hostname = null)
     config_contents = JSON.load(config_file_path)
     log :debug, "Read config file: '#{config_file_path}'"
-    config_contents.map do |framework, pages|
+    frameworks = config_contents.map do |framework, pages|
       Framework.new framework, pages, hostname
     end
-  end
-
-  def pages(config_file_path, hostname = null)
-    frameworks(config_file_path, hostname).flat_map do |framework|
+    frameworks.flat_map do |framework|
       framework.pages
     end
   end
