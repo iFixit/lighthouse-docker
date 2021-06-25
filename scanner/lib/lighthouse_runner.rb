@@ -19,10 +19,7 @@ class LighthouseRunner
     pages.each do |page|
       run_scan page
     end
-    pages.each do |page|
-      @index.add page.framework_name, page.name
-    end
-    generate_index
+    generate_index pages
   end
 
   def run_scan(page)
@@ -52,7 +49,10 @@ class LighthouseRunner
     uri
   end
 
-  def generate_index
+  def generate_index pages
+    pages.each do |page|
+      @index.add page.framework_name, page.name
+    end
     @index.generate_index @output.scan_dir
   end
 end
