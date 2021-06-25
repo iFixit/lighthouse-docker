@@ -57,7 +57,7 @@ class LighthouseRunner
 
   def write_index(index)
     scan_dir = @output.scan_dir
-    index.generate_index scan_dir
+    index.generate_index scan_dir, index.urlmap
   end
 end
 
@@ -75,8 +75,8 @@ class Index
     @urlmap[framework].push page
   end
 
-  def generate_index(scan_dir)
+  def generate_index(scan_dir, urlmap)
     log :info, 'Generating index file'
-    File.write(scan_dir / 'index.json', JSON.dump(@urlmap))
+    File.write(scan_dir / 'index.json', JSON.dump(urlmap))
   end
 end
