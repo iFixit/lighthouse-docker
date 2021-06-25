@@ -43,7 +43,7 @@ class LighthouseRunner
   end
 end
 
-Page = Struct.new :name, :url
+Page = Struct.new :framework_name, :name, :url
 
 ##
 # Represents the lighthouse runs for a particular framework
@@ -60,7 +60,7 @@ class Framework
     @pages.map do |name, url|
       uri = URI.parse url
       uri.host = @hostname if @hostname
-      Page.new name, uri
+      Page.new @name, name, uri
     end
   end
 end
