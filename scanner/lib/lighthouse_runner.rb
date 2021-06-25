@@ -15,7 +15,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    pages(@config_file_path, @hostname) do |page|
+    pages(@config_file_path, @hostname).each do |page|
       @index.add page.framework_name, page.name
       run_scan page
     end
@@ -41,11 +41,8 @@ class LighthouseRunner
   end
 
   def pages(config_file_path, hostname = null)
-    pages = frameworks(config_file_path, hostname).flat_map do |framework|
+    frameworks(config_file_path, hostname).flat_map do |framework|
       framework.pages
-    end
-    pages.each do |page|
-      yield page
     end
   end
 end
