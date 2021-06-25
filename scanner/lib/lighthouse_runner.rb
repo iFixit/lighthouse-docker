@@ -37,11 +37,16 @@ class LighthouseRunner
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.flat_map do |framework, pages|
       pages.map do |name, url|
-        uri = URI.parse url
-        uri.host = hostname if hostname
+        uri = get_uri(url, hostname)
         Page.new framework, name, uri
       end
     end
+  end
+
+  def get_uri(url, hostname)
+    uri = URI.parse url
+    uri.host = hostname if hostname
+    uri
   end
 end
 
