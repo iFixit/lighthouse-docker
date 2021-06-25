@@ -15,7 +15,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    pages(@config_file_path, @hostname).each do |page|
+    pages_from_config(@config_file_path, @hostname).each do |page|
       @index.add page.framework_name, page.name
       run_scan page
     end
@@ -32,7 +32,7 @@ class LighthouseRunner
     )
   end
 
-  def pages(config_file_path, hostname = null)
+  def pages_from_config(config_file_path, hostname = null)
     config_contents = JSON.load(config_file_path)
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.flat_map do |framework, pages|
