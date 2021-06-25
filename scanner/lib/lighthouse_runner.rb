@@ -50,7 +50,8 @@ class LighthouseRunner
   def generate_index pages
     index = Index.new
     pages.each do |page|
-      index.add page.framework_name, page.name
+      index.urlmap[page.framework_name] ||= []
+      index.urlmap[page.framework_name].push page.name
     end
     write_index index
   end
@@ -71,9 +72,4 @@ class Index
   end
 
   attr_accessor :urlmap
-
-  def add(framework, page)
-    @urlmap[framework] ||= []
-    @urlmap[framework].push page
-  end
 end
