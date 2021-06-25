@@ -17,15 +17,15 @@ class LighthouseRunner
     log :info, 'Running Lighthouse scan'
     frameworks(@config_file_path, @hostname).each do |framework|
       framework.pages.each do |page|
-        framework_dir = @output.get_framework_dir(page.framework_name)
         @index.add page.framework_name, page.name
-        run_scan framework_dir, page
+        run_scan page
       end
     end
     @index.generate_index @output.scan_dir
   end
 
-  def run_scan(framework_dir, page)
+  def run_scan(page)
+    framework_dir = @output.get_framework_dir(page.framework_name)
     exit(70) unless Lighthouse.run(
       framework_dir.to_path,
       page.name,
