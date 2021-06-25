@@ -15,7 +15,8 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    pages_from_config(@config_file_path).each do |page|
+    pages = pages_from_config(@config_file_path)
+    pages.each do |page|
       @index.add page.framework_name, page.name
       run_scan page
     end
