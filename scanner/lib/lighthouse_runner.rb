@@ -1,7 +1,7 @@
-require 'lib/scan_output'
 require 'lib/index'
-require_relative '../../lib/utils'
+require 'lib/scan_output'
 require 'uri'
+require_relative '../../lib/utils'
 
 ##
 # Sets up runs of Lighthouse on multiple URLs
