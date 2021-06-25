@@ -35,6 +35,7 @@ class LighthouseRunner
   def pages_from_config(config_file_path)
     config_contents = JSON.load(config_file_path)
     log :debug, "Read config file: '#{config_file_path}'"
+
     config_contents.flat_map do |framework, pages|
       pages.map do |name, url|
         Page.new framework, name, get_uri(url)
