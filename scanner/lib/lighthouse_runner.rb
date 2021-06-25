@@ -45,6 +45,8 @@ end
 
 Page = Struct.new :name, :url
 
+##
+# Represents the lighthouse runs for a particular framework
 class Framework
   attr_reader :name
 
