@@ -15,12 +15,7 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    frameworks(@config_file_path, @hostname).each do |framework|
-      framework.pages.each do |page|
-        @index.add page.framework_name, page.name
-        run_scan page
-      end
-    end
+    pages
     @index.generate_index @output.scan_dir
   end
 
@@ -39,6 +34,15 @@ class LighthouseRunner
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.map do |framework, pages|
       Framework.new framework, pages, hostname
+    end
+  end
+
+  def pages
+    frameworks(@config_file_path, @hostname).each do |framework|
+      framework.pages.each do |page|
+        @index.add page.framework_name, page.name
+        run_scan page
+      end
     end
   end
 end
