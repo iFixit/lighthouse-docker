@@ -36,30 +36,13 @@ class LighthouseRunner
     config_contents = JSON.load(config_file_path)
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.flat_map do |framework, pages|
-      framework = Framework.new framework, pages, hostname
-      framework.pages
+      pages.map do |name, url|
+        uri = URI.parse url
+        uri.host = hostname if hostname
+        Page.new framework, name, uri
+      end
     end
   end
 end
 
 Page = Struct.new :framework_name, :name, :url
-
-##
-# Represents the lighthouse runs for a particular framework
-class Framework
-  attr_reader :name
-
-  def initialize(name, pages, hostname)
-    @name = name
-    @pages = pages
-    @hostname = hostname
-  end
-
-  def pages
-    @pages.map do |name, url|
-      uri = URI.parse url
-      uri.host = @hostname if @hostname
-      Page.new @name, name, uri
-    end
-  end
-end
