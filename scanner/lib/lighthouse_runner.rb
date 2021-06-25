@@ -18,7 +18,7 @@ class LighthouseRunner
     frameworks(@config_file_path, @hostname).each do |framework|
       framework_dir = @output.get_framework_dir(framework.name)
       framework.pages.each do |page|
-        @index.add framework.name, page.name
+        @index.add page.framework_name, page.name
         run_scan framework_dir, page.name, page.url
       end
     end
