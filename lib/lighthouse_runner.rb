@@ -3,7 +3,7 @@ require 'logger'
 require 'uri'
 
 require_relative 'scan_output'
-require_relative '../../lib/utils'
+require_relative 'utils'
 
 ##
 # Sets up runs of Lighthouse on multiple URLs

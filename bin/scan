@@ -4,7 +4,7 @@ require 'pathname'
 
 require 'docopt'
 
-require_relative 'lib/lighthouse_runner'
+require_relative '../lib/lighthouse_runner'
 
 begin
   args = Docopt.docopt <<~DOCOPT
