@@ -65,11 +65,3 @@ class LighthouseRunner
 end
 
 Page = Struct.new :framework_name, :name, :url
-
-class Index
-  def initialize
-    @urlmap = {}
-  end
-
-  attr_accessor :urlmap
-end
