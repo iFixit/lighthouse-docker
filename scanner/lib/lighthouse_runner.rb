@@ -15,7 +15,10 @@ class LighthouseRunner
 
   def run
     log :info, 'Running Lighthouse scan'
-    pages(@config_file_path, @hostname)
+    pages(@config_file_path, @hostname) do |page|
+      @index.add page.framework_name, page.name
+      run_scan page
+    end
     @index.generate_index @output.scan_dir
   end
 
@@ -40,8 +43,7 @@ class LighthouseRunner
   def pages(config_file_path, hostname = null)
     frameworks(config_file_path, hostname).each do |framework|
       framework.pages.each do |page|
-        @index.add page.framework_name, page.name
-        run_scan page
+        yield page
       end
     end
   end
