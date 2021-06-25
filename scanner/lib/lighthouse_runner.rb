@@ -19,17 +19,17 @@ class LighthouseRunner
       framework.pages.each do |page|
         framework_dir = @output.get_framework_dir(page.framework_name)
         @index.add page.framework_name, page.name
-        run_scan framework_dir, page.name, page.url
+        run_scan framework_dir, page
       end
     end
     @index.generate_index @output.scan_dir
   end
 
-  def run_scan(framework_dir, endpoint_name, target_url)
+  def run_scan(framework_dir, page)
     exit(70) unless Lighthouse.run(
       framework_dir.to_path,
-      endpoint_name,
-      target_url.to_s,
+      page.name,
+      page.url.to_s,
       '--output', 'html'
     )
   end
