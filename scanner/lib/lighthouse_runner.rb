@@ -56,7 +56,8 @@ class LighthouseRunner
   end
 
   def write_index(index)
-    index.generate_index @output.scan_dir
+    scan_dir = @output.scan_dir
+    index.generate_index scan_dir
   end
 end
 
