@@ -52,6 +52,10 @@ class LighthouseRunner
     pages.each do |page|
       index.add page.framework_name, page.name
     end
+    write_index index
+  end
+
+  def write_index(index)
     index.generate_index @output.scan_dir
   end
 end
