@@ -41,10 +41,11 @@ class LighthouseRunner
   end
 
   def pages(config_file_path, hostname = null)
-    frameworks(config_file_path, hostname).each do |framework|
-      framework.pages.each do |page|
-        yield page
-      end
+    pages = frameworks(config_file_path, hostname).flat_map do |framework|
+      framework.pages
+    end
+    pages.each do |page|
+      yield page
     end
   end
 end
