@@ -49,11 +49,11 @@ class LighthouseRunner
   end
 
   def generate_index pages
-    @index = Index.new
+    index = Index.new
     pages.each do |page|
-      @index.add page.framework_name, page.name
+      index.add page.framework_name, page.name
     end
-    @index.generate_index @output.scan_dir
+    index.generate_index @output.scan_dir
   end
 end
 
