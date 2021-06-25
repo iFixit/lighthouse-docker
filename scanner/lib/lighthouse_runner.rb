@@ -48,21 +48,15 @@ class LighthouseRunner
   end
 
   def generate_index pages
-    groups = pages.group_by { |page| page.framework_name }
-    index = groups.transform_values do |group|
-      group.map do |page|
-        page.name
-      end
-    end
+    framework_groups = pages.group_by(&:framework_name)
+    index = framework_groups.transform_values { |group| group.map(&:name) }
 
     write_index index
   end
 
   def write_index(index)
-    scan_dir = @output.scan_dir
-
     log :info, 'Generating index file'
-    File.write(scan_dir / 'index.json', JSON.dump(index))
+    File.write(@output.scan_dir / 'index.json', JSON.dump(index))
   end
 end
 
