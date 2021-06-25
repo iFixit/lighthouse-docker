@@ -1,7 +1,7 @@
 require 'lib/scan_output'
-require 'lib/framework'
 require 'lib/index'
 require_relative '../../lib/utils'
+require 'uri'
 
 ##
 # Sets up runs of Lighthouse on multiple URLs
@@ -39,6 +39,26 @@ class LighthouseRunner
     log :debug, "Read config file: '#{config_file_path}'"
     config_contents.map do |framework, pages|
       Framework.new framework, pages, hostname
+    end
+  end
+end
+
+Page = Struct.new :name, :url
+
+class Framework
+  attr_reader :name
+
+  def initialize(name, pages, hostname)
+    @name = name
+    @pages = pages
+    @hostname = hostname
+  end
+
+  def pages
+    @pages.map do |name, url|
+      uri = URI.parse url
+      uri.host = @hostname if @hostname
+      Page.new name, uri
     end
   end
 end
