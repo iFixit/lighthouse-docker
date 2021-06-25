@@ -48,10 +48,10 @@ class LighthouseRunner
   end
 
   def generate_index pages
-    index = Index.new
+    index = {}
     pages.each do |page|
-      index.urlmap[page.framework_name] ||= []
-      index.urlmap[page.framework_name].push page.name
+      index[page.framework_name] ||= []
+      index[page.framework_name].push page.name
     end
     write_index index
   end
@@ -60,7 +60,7 @@ class LighthouseRunner
     scan_dir = @output.scan_dir
 
     log :info, 'Generating index file'
-    File.write(scan_dir / 'index.json', JSON.dump(index.urlmap))
+    File.write(scan_dir / 'index.json', JSON.dump(index))
   end
 end
 
