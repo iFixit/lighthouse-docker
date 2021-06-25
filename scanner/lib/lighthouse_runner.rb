@@ -19,7 +19,7 @@ class LighthouseRunner
       @index.add page.framework_name, page.name
       run_scan page
     end
-    @index.generate_index @output.scan_dir
+    generate_index
   end
 
   def run_scan(page)
@@ -47,6 +47,10 @@ class LighthouseRunner
     uri = URI.parse url
     uri.host = @hostname if @hostname
     uri
+  end
+
+  def generate_index
+    @index.generate_index @output.scan_dir
   end
 end
 
