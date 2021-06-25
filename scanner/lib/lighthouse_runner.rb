@@ -63,6 +63,8 @@ class Index
     @urlmap = {}
   end
 
+  attr_accessor :urlmap
+
   def add(framework, page)
     @urlmap[framework] ||= []
     @urlmap[framework].push page
