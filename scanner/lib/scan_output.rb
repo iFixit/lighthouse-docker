@@ -33,11 +33,4 @@ class ScanOutput
     framework_subdir.mkpath
     framework_subdir
   end
-
-  private
-
-  def make_output_dir
-    Scriptster.log :debug, 'Creating output directory...'
-    @scan_dir.mkpath
-  end
 end
