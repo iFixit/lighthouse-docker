@@ -10,7 +10,6 @@ class LighthouseRunner
     @config_file_path = config_file_path
     @hostname = hostname
     @output = ScanOutput.new(output_dir, hostname)
-    @index = Index.new
   end
 
   def run
@@ -50,6 +49,7 @@ class LighthouseRunner
   end
 
   def generate_index pages
+    @index = Index.new
     pages.each do |page|
       @index.add page.framework_name, page.name
     end
