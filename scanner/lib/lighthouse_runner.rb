@@ -48,11 +48,13 @@ class LighthouseRunner
   end
 
   def generate_index pages
-    index = {}
-    pages.each do |page|
-      index[page.framework_name] ||= []
-      index[page.framework_name].push page.name
+    groups = pages.group_by { |page| page.framework_name }
+    index = groups.transform_values do |group|
+      group.map do |page|
+        page.name
+      end
     end
+
     write_index index
   end
 
