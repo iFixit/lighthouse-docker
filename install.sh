@@ -2,4 +2,5 @@
 
 docker build -t lighthouse lighthouse-docker
 
-gem install docopt
+gem install bundler
+bundle install
