@@ -11,22 +11,7 @@ It provides a Docker container which wraps up Lighthouse, a couple scripts for r
 should install the Ruby dependency (docopt) and build the Docker container.
 
 ## Usage
-There are two scripts provided to gather Lighthouse results for URLs:
-
-### Single Lighthouse run:
-Use the `lighthouse` script to run a single Lighthouse run against some URL:
-```sh
-bin/lighthouse [--html] <output_directory> <endpoint_name> <URL>
-```
-
-Pass in:
-- an output directory to put the result files into
-- a name for the endpoint to audit
-- an URL
-
-This will emit the full Lighthouse report into the output directory and name it `<endpoint_name>.json`.
-
-Use the `--html` flag to emit the human-readable HTML report instead.
+The Docker container built by the `install.sh` script is tagged with `lighthouse`. You can use it in place of an `npm` install of lighthouse by doing `docker run --rm lighthouse` and passing all the same arguments you'd pass to `npx lighthouse`. The container has the advantage of not being dependent on your system environment for its functionality.
 
 ### Lighthouse Performance Analysis
 For simplicity, the following examples all assume the `bin` directory is in the user's `PATH`:
@@ -54,3 +39,6 @@ This will start a Docker container running an instance of RStudio which has acce
 In RStudio, open the `analysis.R` script. Change the `results` line to point at your results directory (if you're following along with our example, it should already be correct). Change the vector of names being passed to `webperf::read_lighthouse_json` to include all the configurations you gathered results for. If needed, change the `3` to be the number of runs you ran (the default for `bin/run` is three, so if you're using the defaults you can leave it alone).
 
 Run all the lines of `analysis.R` through line 15. Then run any of the lines that call `webperf::analyze_change` to analyze the change in the provided metric across your configurations.
+
+### Lighthouse Scanning
+The `bin/scan` script accepts a config file which specifies groups of URLs to run Lighthouse against. It runs Lighthouse against all of them and creates a directory structure of the outputs which reflects the structure of the input file. A demo config file is provided in `scan_config.json`. All the keys are arbitrary; the two-level structure will be replicated in the output directory structure. The inner values are the URLs to scan.
