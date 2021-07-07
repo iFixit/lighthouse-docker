@@ -1,0 +1,156 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'json'
+require 'pathname'
+require 'date'
+require 'optparse'
+
+##
+# Tools to convert a Lighthouse report into Prometheus metrics format
+class LighthousePrometheus
+  Metric = Struct.new(:url, :timestamp, :name, :value, :help, keyword_init: true)
+
+  AUDITS = %w[
+    first-contentful-paint
+    speed-index
+    largest-contentful-paint
+    interactive
+    total-blocking-time
+    cumulative-layout-shift
+  ].freeze
+
+  def main(lighthouse_run)
+    pages = lighthouse_run.glob('*/*.json')
+    metrics = pages.flat_map { |page| to_metrics page }
+    lines = metrics.map { |metric| to_prom_entry metric }
+    print lines.join("\n")
+  end
+
+  private
+
+  def to_metrics(page)
+    data = JSON.parse page.read
+
+    url = data['requestedUrl']
+    timestamp = DateTime.iso8601 data['fetchTime']
+
+    page_metrics = [
+      perf_score_metric(url, timestamp, data),
+      total_weight_metric(url, timestamp, data)
+    ]
+
+    page_metrics + mime_metrics(url, timestamp, data) +
+      audit_metrics(url, timestamp, data)
+  end
+
+  def perf_score_metric(url, timestamp, data)
+     Metric.new(
+        url: url,
+        timestamp: timestamp,
+        name: "lighthouse_performance_score",
+        value: data['categories']['performance']['score'].to_f,
+        help: 'The overall performance score'
+     )
+  end
+
+  def total_weight_metric(url, timestamp, data)
+    Metric.new(
+      url: url,
+      timestamp: timestamp,
+      name: "lighthouse_total_page_weight",
+      value: data['audits']['total-byte-weight']['numericValue'].to_f,
+      help: 'The total number of bytes to download for the page'
+    )
+  end
+
+  def mime_metrics(url, timestamp, data)
+    requests = data['audits']['network-requests']['details']['items']
+    mime_metrics = mime_metrics_group url, timestamp, requests, 'total'
+
+    dcl_time = data['audits']['metrics']['details']['items'][0]\
+                   ['observedDomContentLoaded']
+
+    pre_dcl_requests = requests.select { |r| r['endTime'] <= dcl_time }
+    pre_dcl_mime_metrics = mime_metrics_group(url, timestamp, pre_dcl_requests,
+                                              'pre-DCL')
+
+    post_dcl_requests = requests.select { |r| r['endTime'] > dcl_time }
+    post_dcl_mime_metrics = mime_metrics_group(url, timestamp,
+                                               post_dcl_requests, 'post-DCL')
+
+    mime_metrics + pre_dcl_mime_metrics + post_dcl_mime_metrics
+  end
+
+  def audit_metrics(url, timestamp, data)
+    AUDITS.map do |audit|
+      result = data['audits'][audit] or raise "No #{audit} key"
+      Metric.new(
+        url: url,
+        timestamp: timestamp,
+        name: 'lighthouse_' + audit.gsub('-', '_'),
+        value: result['score'].to_f,
+        help: result['title']
+      )
+    end
+  end
+
+  def mime_metrics_group(url, timestamp, network_requests, note)
+    normalized_mime_types = network_requests.map { |r| normalize_mime(r['mimeType']) }.uniq
+    normalized_mime_types.flat_map do |normalized_mime|
+      %w[transferSize resourceSize].map do |byte_type|
+        mime_weight_metric(url, timestamp, network_requests, normalized_mime, byte_type, note)
+      end
+    end
+  end
+
+  def normalize_mime(mime_type)
+     case mime_type
+        when /javascript/i
+           'javascript'
+        when /css/i
+           'css'
+        when /image/i
+           'image'
+        when /video/i
+           'video'
+        when /font/i
+           'font'
+        when /html/i
+           'html'
+        else
+           mime_type
+     end
+  end
+
+  def mime_weight_metric(url, timestamp, network_requests, normalized_mime, byte_type, note)
+    matches = network_requests.select{|i| normalize_mime(i['mimeType']) == normalized_mime }
+    total = matches.sum{|i| i[byte_type]}
+    Metric.new(
+      url: url,
+      timestamp: timestamp,
+      name: "lighthouse_mime_weight_#{normalized_mime}_#{byte_type}_#{note}",
+      value: total.to_f,
+      help: "The number of #{byte_type} bytes of #{normalized_mime} downloaded for the page (#{note})"
+    )
+  end
+
+  def to_prom_entry(metric)
+    unixtime = metric.timestamp.to_time.to_i
+    timestamp = 1000 * unixtime
+    # Convert metric name to be valid
+    name = metric.name.gsub(/[^a-zA-Z0-9:_]/, "_")
+    <<~PROM_METRIC
+      # HELP #{name} #{metric.help}
+      # TYPE #{name} gauge
+      #{name}{url="#{metric.url}"} #{metric.value.to_f}
+    PROM_METRIC
+  end
+end
+
+# Use `OptionParser` for nice -h/--help handling
+OptionParser.new do |opts|
+  opts.banner = 'Usage: summarize.rb <lighthouse_output_path>'
+end.parse!
+
+LighthousePrometheus.new.main Pathname.new(ARGV[0])
