@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    docopt (0.6.1)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  docopt
+
+BUNDLED WITH
+   2.2.3

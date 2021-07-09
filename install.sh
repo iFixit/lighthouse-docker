@@ -1,5 +1,6 @@
 #!/bin/bash
 
-docker build -t lighthouse .
+docker build -t lighthouse lighthouse-docker
 
-gem install scriptster
+gem install bundler
+bundle install

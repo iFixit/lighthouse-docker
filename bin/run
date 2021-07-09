@@ -1,0 +1,142 @@
+#!/usr/bin/env ruby
+
+require 'docopt'
+require 'pathname'
+require 'fileutils'
+require 'timeout'
+require 'uri'
+require 'cgi'
+require 'English'
+require 'logger'
+require_relative '../lib/utils'
+
+Log = Logger.new($stderr)
+
+ROOT = Pathname(__dir__)
+CONFIG_FILE_NAME = 'lighthouse-config.js'
+CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
+
+def lighthouse(url, target)
+  FileUtils.cp CONFIG_FILE, CONFIG_FILE_NAME
+  raise "Lighthouse failed five times for #{target}; was trying to load #{url}" unless
+    Lighthouse.run(
+      Dir.pwd,
+      target,
+      url.to_s,
+      '--output', 'json',
+      "--config-path=/var/lighthouse/#{CONFIG_FILE_NAME}"
+    )
+end
+
+$uniq_id = 0
+
+Run = Struct.new(:uri, :props, :number, keyword_init: true) do
+  ##
+  # Generate a distinguishing name for this run
+  # Used for naming the resulting output files.
+  def env
+    # `number` is 0-indexed in the struct, so we need to add 1 to get nice
+    # human-readable run numbers.
+    "#{props.join}_#{number + 1}"
+  end
+
+  def url
+    busted = uri.to_s.gsub(/%3Cbust%3E/) do |_|
+      $uniq_id += 1
+      CGI.escape("#{env}#{Time.now.to_f}_id#{$uniq_id}")
+    end
+    URI(busted)
+  end
+end
+
+def main
+  opt = Docopt.docopt <<~DOCOPT
+    Usage:
+      run [options] <env=url>...
+
+    Options:
+      --count=<count>  Number of runs to do [default: 3]
+      --start=<start>  Run number to begin at [default: 1]
+      --cache-buster=<alt>   Add a unique-valued `cacheBuster` param to every URL. Providing an <alt> value of "both" will generate results for both versions: with and without cache busting.
+      --varnish-buster=<alt>  Add a unique-valued `varnishBuster` param to every URL. Providing an <alt> value of "both" will generate results for both versions: with and without varnish busting.
+      --dry-run        Print list of requests which would be made
+  DOCOPT
+
+  count = opt['--count'].to_i
+  start = opt['--start'].to_i
+  pairs = opt['<env=url>'].map { |p| p.split('=', 2) }
+  cache_buster = opt['--cache-buster']
+  varnish_buster = opt['--varnish-buster']
+  runs = generate_runs start, count, pairs
+
+  runs = add_cache_buster(runs, cache_buster == 'both') if cache_buster
+  runs = add_varnish_buster(runs, varnish_buster == 'both') if varnish_buster
+
+  if opt['--dry-run']
+    runs.each do |run|
+      pp({ url: run.url, env: run.env })
+    end
+    exit 0
+  end
+
+  run_scan pairs, runs
+rescue Docopt::Exit => e
+  puts e.message
+  exit 1
+end
+
+def generate_runs(start, count, pairs)
+  Log.info "Running #{count} times starting at #{start}"
+  count.times.flat_map do |run|
+    pairs.shuffle.map do |env, url|
+      Run.new(uri: URI(url), props: [env], number: (start + run - 1))
+    end
+  end
+end
+
+def run_scan(pairs, requests)
+  # Try up to ten times, waiting up to four minutes for a reply from the server
+  pairs.shuffle.each do |_env, url|
+    Log.info "Checking if #{url} is ready"
+    ExecHelpers.run 'curl', '--max-time', (4 * 60).to_s, '--retry', '10', url.to_s, out: '/dev/null'
+    lighthouse url, 'warmup.json'
+  end
+  sleep 5
+  requests.each do |run|
+    Log.info "Testing #{run.env} at #{run.url}"
+    lighthouse run.url, "#{run.env}.json"
+    sleep 5
+  end
+end
+
+def add_cache_buster(runs, both)
+  add_buster_to_runs 'cacheBuster', 'Bust', runs, both
+end
+
+def add_varnish_buster(runs, both)
+  add_buster_to_runs 'varnishBuster', 'NoVarnish', runs, both
+end
+
+def add_buster_to_runs(name, prop, runs, both)
+  runs.flat_map do |run|
+    busted = add_buster_param(name, prop, run)
+    if both
+      [run, busted]
+    else
+      [busted]
+    end
+  end
+end
+
+def add_buster_param(name, prop, run)
+  param = "#{name}=<bust>"
+  uri = run.uri.clone
+  if uri.query
+    uri.query += "&#{param}"
+  else
+    uri.query = param
+  end
+  Run.new uri: uri, props: run.props + [prop], number: run.number
+end
+
+main
