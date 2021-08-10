@@ -14,10 +14,12 @@ Log = Logger.new($stderr)
 
 ROOT = Pathname(__dir__)
 CONFIG_FILE_NAME = 'lighthouse-config.js'
+DESKTOP_CONFIG_FILE_NAME = 'lighthouse-config-desktop.js'
 CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
+DESKTOP_CONFIG_FILE = ROOT / '..' / DESKTOP_CONFIG_FILE_NAME
 
-def lighthouse(url, target)
-  FileUtils.cp CONFIG_FILE, CONFIG_FILE_NAME
+def lighthouse(url, target, config_file)
+  FileUtils.cp config_file, CONFIG_FILE_NAME
   raise "Lighthouse failed five times for #{target}; was trying to load #{url}" unless
     Lighthouse.run(
       Dir.pwd,
@@ -30,7 +32,7 @@ end
 
 $uniq_id = 0
 
-Run = Struct.new(:uri, :props, :number, keyword_init: true) do
+Run = Struct.new(:uri, :props, :number, :config, keyword_init: true) do
   ##
   # Generate a distinguishing name for this run
   # Used for naming the resulting output files.
@@ -60,6 +62,7 @@ def main
       --cache-buster=<alt>   Add a unique-valued `cacheBuster` param to every URL. Providing an <alt> value of "both" will generate results for both versions: with and without cache busting.
       --varnish-buster=<alt>  Add a unique-valued `varnishBuster` param to every URL. Providing an <alt> value of "both" will generate results for both versions: with and without varnish busting.
       --dry-run        Print list of requests which would be made
+      --desktop        Run Lighthouse with a desktop-oriented config
   DOCOPT
 
   count = opt['--count'].to_i
@@ -67,10 +70,12 @@ def main
   pairs = opt['<env=url>'].map { |p| p.split('=', 2) }
   cache_buster = opt['--cache-buster']
   varnish_buster = opt['--varnish-buster']
+  desktop = opt['--desktop']
   runs = generate_runs start, count, pairs
 
   runs = add_cache_buster(runs, cache_buster == 'both') if cache_buster
   runs = add_varnish_buster(runs, varnish_buster == 'both') if varnish_buster
+  runs = add_desktop(runs) if desktop
 
   if opt['--dry-run']
     runs.each do |run|
@@ -89,7 +94,12 @@ def generate_runs(start, count, pairs)
   Log.info "Running #{count} times starting at #{start}"
   count.times.flat_map do |run|
     pairs.shuffle.map do |env, url|
-      Run.new(uri: URI(url), props: [env], number: (start + run - 1))
+      Run.new(
+        uri: URI(url),
+        props: [env],
+        number: (start + run - 1),
+        config: CONFIG_FILE
+      )
     end
   end
 end
@@ -99,13 +109,33 @@ def run_scan(pairs, requests)
   pairs.shuffle.each do |_env, url|
     Log.info "Checking if #{url} is ready"
     ExecHelpers.run 'curl', '--max-time', (4 * 60).to_s, '--retry', '10', url.to_s, out: '/dev/null'
-    lighthouse url, 'warmup.json'
+    # Warm up both the desktop amd mobile pages
+    lighthouse url, 'warmup.json', DESKTOP_CONFIG_FILE
+    lighthouse url, 'warmup.json', CONFIG_FILE
   end
   sleep 5
   requests.each do |run|
     Log.info "Testing #{run.env} at #{run.url}"
-    lighthouse run.url, "#{run.env}.json"
+    lighthouse run.url, "#{run.env}.json", run.config
     sleep 5
+  end
+end
+
+def add_desktop(runs)
+  runs.flat_map do |run|
+    desktopped = Run.new(
+      uri: run.uri,
+      props: run.props + ['desktop'],
+      number: run.number,
+      config: DESKTOP_CONFIG_FILE
+    )
+    mobiled = Run.new(
+      uri: run.uri,
+      props: run.props + ['mobile'],
+      number: run.number,
+      config: CONFIG_FILE
+    )
+    [mobiled, desktopped]
   end
 end
 
