@@ -19,6 +19,7 @@ CONFIG_FILE = ROOT / '..' / CONFIG_FILE_NAME
 DESKTOP_CONFIG_FILE = ROOT / '..' / DESKTOP_CONFIG_FILE_NAME
 
 def lighthouse(url, target, config_file)
+  Log.info "Using #{config_file}"
   FileUtils.cp config_file, CONFIG_FILE_NAME
   raise "Lighthouse failed five times for #{target}; was trying to load #{url}" unless
     Lighthouse.run(
