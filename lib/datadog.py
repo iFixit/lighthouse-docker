@@ -15,8 +15,7 @@ configuration = Configuration()
 api_client = ApiClient(configuration)
 
 configuration.api_key["apiKeyAuth"] = os.getenv('DD_API_KEY')
-configuration.api_key["appKeyAuth"] = os.getenv('DD_APP_KEY')
-
+configuration.api_key["appKeyAuth"] = os.getenv('DD_APPLICATION_KEY')
 
 from datadog_api_client.v1.model.point import Point
 
