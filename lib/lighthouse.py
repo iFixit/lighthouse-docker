@@ -1,6 +1,6 @@
 import json
 import subprocess
-
+from urllib.parse import urlparse
 from datadog import DataDogApiClient
 
 class Lighthouse:
@@ -43,7 +43,17 @@ class Lighthouse:
         return json_results.get('audits').get(audit_name).get('numericValue') or 0
 
     def send_metrics_to_datadog(self, url, metrics):
-        tags = {'url': url, 'test': 'test'}
+        page_path = urlparse(url).path.split('/')[1:]
+        if page_path:
+            page_type = page_path[0]
+        else:
+            page_type = 'Home'
+
+        tags = {
+            'page_type': page_type,
+            'url': url,
+            'test': 'test'
+        }
         tags = [f'{k}:{v}' for k, v in tags.items()]
 
         datadog = DataDogApiClient.get_instance()
@@ -54,3 +64,4 @@ class Lighthouse:
 if __name__ == '__main__':
     lighthouse = Lighthouse()
     lighthouse.run('https://www.ifixit.com')
+    lighthouse.run('https://www.ifixit.com/Device/Mac')
