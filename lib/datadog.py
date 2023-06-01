@@ -7,8 +7,6 @@ from datadog_api_client.v2.model.metric_payload import MetricPayload
 from datadog_api_client.v2.model.metric_intake_type import MetricIntakeType
 import os, time
 
-from dotenv import load_dotenv
-load_dotenv()
 
 class DataDogApiClient:
     __instance = None
