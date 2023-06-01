@@ -1,5 +1,5 @@
 from lighthouse import Lighthouse
-from datadog import DataDogApiClient
+from datadog_api import DataDogApiClient
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
@@ -52,10 +52,10 @@ def send_metrics_to_datadog(url, metrics):
     }
     tags = [f'{k}:{v}' for k, v in tags.items()]
 
-    datadog = DataDogApiClient.get_instance()
+    dd_client = DataDogApiClient.get_instance()
 
     for metric_name, value in metrics.items():
-        datadog.submit_metric(f'lighthouse.{metric_name}', value, tags)
+        dd_client.submit_metric(f'lighthouse.{metric_name}', value, tags)
 
 def main():
     lighthouse = Lighthouse()
@@ -73,9 +73,13 @@ def main():
             send_metrics_to_datadog(url, metrics)
 
             print(f'Finished sending metrics to datadog for {url}\n')
+
+            print('=' * 80)
         except Exception as e:
             print(f'Failed to run lighthouse for {url}: {e}')
             raise e
+
+    print('Finished running lighthouse for all urls')
 
 if __name__ == '__main__':
     main()
