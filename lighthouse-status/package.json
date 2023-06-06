@@ -19,7 +19,7 @@
     "chartjs-adapter-luxon": "^0.2.2",
     "chartjs-plugin-crosshair": "^1.1.6",
     "lodash": "^4.17.20",
-    "luxon": "^1.25.0",
+    "luxon": "^1.28.1",
     "plotly.js": "^1.54.7",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
