@@ -11327,10 +11327,10 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"luxon@npm:^1.25.0":
-  version: 1.25.0
-  resolution: "luxon@npm:1.25.0"
-  checksum: 3f0d64355beab707f5e8eb4e2d7e1cad90569c2a4c4dce440e0b4be4eb6833ec1a83513a4210361cd4dc5a266c0221718a9afd15f7cde3002d8fa1d0976b9e50
+"luxon@npm:^1.28.1":
+  version: 1.28.1
+  resolution: "luxon@npm:1.28.1"
+  checksum: c7e02b18b9f686f2437a70429d545aca100515679ad5f242ef2cb0981ddbee3ce002cfe4dd28f78f5794e10d03e57c2e9a1b32dd97bed823f87c02903f2c299d
   languageName: node
   linkType: hard
 
@@ -11625,7 +11625,7 @@ fsevents@~2.1.2:
     chartjs-adapter-luxon: ^0.2.2
     chartjs-plugin-crosshair: ^1.1.6
     lodash: ^4.17.20
-    luxon: ^1.25.0
+    luxon: ^1.28.1
     plotly.js: ^1.54.7
     prop-types: ^15.7.2
     react: ^16.13.1
