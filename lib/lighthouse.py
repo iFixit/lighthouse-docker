@@ -18,6 +18,7 @@ class Lighthouse:
         ]
 
         self.lighthouse_options = [
+            '--no-enable-error-reporting',
             '--output=json',
             '--quiet',
         ]
