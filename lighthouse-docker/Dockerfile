@@ -1,13 +1,13 @@
-FROM alpine:20210212
+FROM node:18-slim
 
 WORKDIR /opt/lighthouse
 
-RUN apk --update-cache --no-cache \
-     add npm chromium \
-    && npm install lighthouse@8.0.0 \
-    && mkdir -p /root/.config/configstore \
-    && echo '{"isErrorReportingEnabled": false}' > /root/.config/configstore/lighthouse.json
+RUN apt-get update --fix-missing && apt-get -y upgrade \
+    && apt-get install -y chromium \
+    && npm install --global lighthouse@10.3.0 \
+    && apt-get clean
 
-VOLUME /var/lighthouse
+ENV CHROME_PATH=/usr/bin/chromium
+ENV CHROMIUM_FLAGS="--headless --no-sandbox --disable-dev-shm-usage"
 
-ENTRYPOINT [ "npx", "lighthouse" ]
+ENTRYPOINT ["lighthouse"]
