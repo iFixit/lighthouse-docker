@@ -1,19 +1,9 @@
+import json
 from lighthouse import Lighthouse
 from datadog_api import DataDogApiClient
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
-
-urls = [
-    'https://www.ifixit.com',
-    'https://www.ifixit.com/Device/Mac',
-    'https://www.ifixit.com/Guide/How+Install+a+Mac+SSD+into+an+OWC+Envoy+Pro+Enclosure/120579',
-    'https://www.ifixit.com/News/76148/ifixit-has-genuine-parts-for-repairing-hp-laptops',
-    'https://www.ifixit.com/Parts',
-    'https://www.ifixit.com/Tools',
-    'https://www.ifixit.com/Answers',
-    'https://www.ifixit.com/Answers/View/791009/How+to+remove+iCloud+Activation+Lock'
-]
 
 def parse_json_report(json_results):
     # Cumulative Layout Shift
@@ -38,13 +28,7 @@ def parse_json_report(json_results):
 def get_audits_value(json_results, audit_name):
     return json_results.get('audits').get(audit_name).get('numericValue') or 0
 
-def send_metrics_to_datadog(url, metrics):
-    page_path = urlparse(url).path.split('/')[1:]
-    if page_path:
-        page_type = page_path[0]
-    else:
-        page_type = 'Home'
-
+def send_metrics_to_datadog(page_type, url, metrics):
     tags = {
         'page_type': page_type,
         'url': url,
@@ -58,28 +42,34 @@ def send_metrics_to_datadog(url, metrics):
 
 def main():
     lighthouse = Lighthouse()
+    with open('urls.json') as f:
+        urls = json.load(f)
 
-    for url in urls:
-        try:
-            print(f'Running lighthouse for {url}')
-            json_results = lighthouse.run(url)
-            print(f'Finished running lighthouse for {url}\n')
+    for page_type, url_list in urls.items():
+        print(f'Running Lighthouse for {page_type} pages\n')
 
-            print(f'Parsing lighthouse results for {url}\n')
-            metrics = parse_json_report(json_results)
+        for url in url_list:
+            try:
+                print(f'Running lighthouse for {url}')
+                json_results = lighthouse.run(url)
+                print(f'Finished running lighthouse for {url}\n')
 
-            print(f'Sending metrics to datadog for {url}')
-            send_metrics_to_datadog(url, metrics)
+                print(f'Parsing lighthouse results for {url}\n')
+                metrics = parse_json_report(json_results)
 
-            print(f'Finished sending metrics to datadog for {url}\n')
+                print(f'Sending metrics to datadog for {url}')
+                send_metrics_to_datadog(page_type, url, metrics)
 
-            print('=' * 80)
-        except Exception as e:
-            error_message = f'Failed to run lighthouse for {url}: {e}'
-            print(error_message)
-            raise Exception(error_message)
+                print(f'Finished sending metrics to datadog for {url}\n')
 
-    print('Finished running lighthouse for all urls')
+                print('=' * 80)
+            except Exception as e:
+                error_message = f'Failed to run lighthouse for {url}: {e}'
+                print(error_message)
+                raise Exception(error_message)
+
+        print(f'Finished running lighthouse for all urls of {page_type} pages\n')
+    print(f'Finished running lighthouse for all urls\n')
 
 if __name__ == '__main__':
     main()
