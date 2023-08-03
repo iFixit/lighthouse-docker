@@ -1,0 +1,3 @@
+{
+    "audits": [] // array of audits to scrape from lighthouse reports
+}
