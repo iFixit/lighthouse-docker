@@ -5,34 +5,16 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 load_dotenv()
 
-def parse_json_report(json_results):
-    # Cumulative Layout Shift
-    cumulative_layout_shift = get_audits_value(json_results, 'cumulative-layout-shift')
-
-    # Largest Contentful Paint
-    largest_contentful_paint = get_audits_value(json_results, 'largest-contentful-paint')
-
-    # Total Blocking Time
-    total_blocking_time = get_audits_value(json_results, 'total-blocking-time')
-
-    # Network Request Total Transfer Size
-    page_size = json_results.get('audits').get('diagnostics').get('details').get('items')[0].get('totalByteWeight')
-
-    return {
-        'cumulative_layout_shift': cumulative_layout_shift,
-        'largest_contentful_paint': largest_contentful_paint,
-        'total_blocking_time': total_blocking_time,
-        'page_size': page_size
-    }
+def retrieve_values_for_audits(json_results, audits):
+   metrics = {}
+   for audit in audits:
+        metrics[audit] = get_audits_value(json_results, audit)
+   return metrics
 
 def get_audits_value(json_results, audit_name):
     return json_results.get('audits').get(audit_name).get('numericValue') or 0
 
-def send_metrics_to_datadog(page_type, url, metrics):
-    tags = {
-        'page_type': page_type,
-        'url': url,
-    }
+def send_metrics_to_datadog(metrics, tags={}):
     tags = [f'{k}:{v}' for k, v in tags.items()]
 
     dd_client = DataDogApiClient()
@@ -45,6 +27,10 @@ def main():
     with open('urls.json') as f:
         urls = json.load(f)
 
+    with open('metrics-config.json') as f:
+        metrics_config = json.load(f)
+        audits = metrics_config.get('audits')
+
     for page_type, url_list in urls.items():
         print(f'Running Lighthouse for {page_type} pages\n')
 
@@ -55,10 +41,14 @@ def main():
                 print(f'Finished running lighthouse for {url}\n')
 
                 print(f'Parsing lighthouse results for {url}\n')
-                metrics = parse_json_report(json_results)
+                metrics = retrieve_values_for_audits(json_results, audits)
 
                 print(f'Sending metrics to datadog for {url}')
-                send_metrics_to_datadog(page_type, url, metrics)
+                send_metrics_to_datadog(metrics, tags = {
+                    'url': url,
+                    'page_type': page_type,
+                    'lighthouse_version': json_results.get('lighthouseVersion'),
+                })
 
                 print(f'Finished sending metrics to datadog for {url}\n')
 
