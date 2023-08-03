@@ -44,7 +44,11 @@ def main():
                 metrics = retrieve_values_for_audits(json_results, audits)
 
                 print(f'Sending metrics to datadog for {url}')
-                send_metrics_to_datadog(metrics, tags = {'url': url, 'page_type': page_type})
+                send_metrics_to_datadog(metrics, tags = {
+                    'url': url,
+                    'page_type': page_type,
+                    'lighthouse_version': json_results.get('lighthouseVersion'),
+                })
 
                 print(f'Finished sending metrics to datadog for {url}\n')
 
