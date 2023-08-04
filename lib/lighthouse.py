@@ -23,8 +23,9 @@ class Lighthouse:
             '--quiet',
         ]
 
-    def run(self, url):
-        command = self.command + [url] + self.lighthouse_options
+    def run(self, url, options=[]):
+        options = options + self.lighthouse_options
+        command = self.command + [url] + options
         result = subprocess.run(command, stdout=subprocess.PIPE)
 
         if result.returncode != 0:
@@ -36,7 +37,7 @@ class Lighthouse:
 
 if __name__ == '__main__':
     lighthouse = Lighthouse()
-    json_result = lighthouse.run('https://www.ifixit.com')
+    json_result = lighthouse.run('https://www.ifixit.com', ['--preset=desktop'])
     # Save the json_result to a file for debugging
     with open('lighthouse.json', 'w') as f:
         json.dump(json_result, f, indent=4)
