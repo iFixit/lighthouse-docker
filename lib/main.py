@@ -1,4 +1,4 @@
-import json
+import json, os
 from lighthouse import Lighthouse
 from datadog_api import DataDogApiClient
 from urllib.parse import urlparse
@@ -49,10 +49,15 @@ def capture_lighthouse_metrics(page_type, url, audits, lighthouse_options=[]):
     print('=' * 80)
 
 def main():
-    with open('urls.json') as f:
+    scripts_path = os.path.abspath(__file__)
+    project_root = os.path.dirname(os.path.dirname(scripts_path))
+
+    urls_path = os.path.join(project_root, 'urls.json')
+    with open(urls_path) as f:
         urls = json.load(f)
 
-    with open('metrics-config.json') as f:
+    metrics_config_path = os.path.join(project_root, 'metrics-config.json')
+    with open(metrics_config_path) as f:
         metrics_config = json.load(f)
         audits = metrics_config.get('audits')
 
