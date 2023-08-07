@@ -22,8 +22,33 @@ def send_metrics_to_datadog(metrics, tags={}):
     for metric_name, value in metrics.items():
         dd_client.submit_metric(f'lighthouse.{metric_name}', value, tags)
 
-def main():
+def capture_lighthouse_metrics(page_type, url, audits, lighthouse_options=[]):
     lighthouse = Lighthouse()
+    form_factor = 'mobile'
+
+    if '--preset=desktop' in lighthouse_options:
+        form_factor = 'desktop'
+
+    print(f'Running lighthouse for {url} with {form_factor} options\n')
+    json_results = lighthouse.run(url, lighthouse_options)
+    print(f'Finished running lighthouse for {url}\n')
+
+    print(f'Parsing lighthouse results for {url}\n')
+    metrics = retrieve_values_for_audits(json_results, audits)
+
+    print(f'Sending metrics to datadog for {url}')
+    send_metrics_to_datadog(metrics, tags = {
+        'url': url,
+        'page_type': page_type,
+        'lighthouse_version': json_results.get('lighthouseVersion'),
+        'form_factor': form_factor,
+    })
+
+    print(f'Finished sending metrics to datadog for {url}\n')
+
+    print('=' * 80)
+
+def main():
     with open('urls.json') as f:
         urls = json.load(f)
 
@@ -36,23 +61,8 @@ def main():
 
         for url in url_list:
             try:
-                print(f'Running lighthouse for {url}')
-                json_results = lighthouse.run(url)
-                print(f'Finished running lighthouse for {url}\n')
-
-                print(f'Parsing lighthouse results for {url}\n')
-                metrics = retrieve_values_for_audits(json_results, audits)
-
-                print(f'Sending metrics to datadog for {url}')
-                send_metrics_to_datadog(metrics, tags = {
-                    'url': url,
-                    'page_type': page_type,
-                    'lighthouse_version': json_results.get('lighthouseVersion'),
-                })
-
-                print(f'Finished sending metrics to datadog for {url}\n')
-
-                print('=' * 80)
+                capture_lighthouse_metrics(page_type, url, audits, ['--preset=desktop'])
+                capture_lighthouse_metrics(page_type, url, audits, ['--form-factor=mobile'])
             except Exception as e:
                 error_message = f'Failed to run lighthouse for {url}: {e}'
                 print(error_message)
