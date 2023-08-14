@@ -32,21 +32,30 @@ class Lighthouse:
         if not is_lighthouse_installed_globally() and not is_lighthouse_installed_locally():
             raise Exception('Lighthouse package is not installed.\nPlease install it with `npm install -g lighthouse` or `npm install lighthouse`')
 
-    # def run(self, url, options=[]):
-    #     options = options + self.lighthouse_options
-    #     command = self.command + [url] + options
-    #     result = subprocess.run(command, stdout=subprocess.PIPE)
+        self.command = ['lighthouse']
+        self.lighthouse_options = [
+            '--no-enable-error-reporting',
+            '--chrome-flags="--headless"',
+            '--output=json',
+            '--quiet',
+        ]
 
-    #     if result.returncode != 0:
-    #         output = result.stdout.decode('utf-8')
-    #         print(output)
-    #         raise Exception('Lighthouse failed')
+    def run(self, url, options=[]):
+        options = options + self.lighthouse_options
+        command = self.command + options + [url]
+        print(f'Running command: {command}')
+        result = subprocess.run(command, stdout=subprocess.PIPE)
 
-    #     return json.loads(result.stdout)
+        if result.returncode != 0:
+            output = result.stdout.decode('utf-8')
+            print(output)
+            raise Exception('Lighthouse failed')
+
+        return json.loads(result.stdout)
 
 if __name__ == '__main__':
     lighthouse = Lighthouse()
-    # json_result = lighthouse.run('https://www.ifixit.com', ['--preset=desktop'])
+    json_result = lighthouse.run('https://www.ifixit.com', ['--preset=desktop'])
     # # Save the json_result to a file for debugging
-    # with open('lighthouse.json', 'w') as f:
-    #     json.dump(json_result, f, indent=4)
+    with open('lighthouse.json', 'w') as f:
+        json.dump(json_result, f, indent=4)
