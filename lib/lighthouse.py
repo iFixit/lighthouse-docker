@@ -1,12 +1,12 @@
 import json
 import subprocess
+import shutil
 
 def is_lighthouse_installed_locally():
     try:
         result = subprocess.run(['npm', 'list', 'lighthouse'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = result.stdout.decode('utf-8')
         if 'lighthouse@' in output:
-            print('Lighthouse Installed Locally')
             return True
         return False
     except Exception as e:
@@ -18,19 +18,27 @@ def is_lighthouse_installed_globally():
         result = subprocess.run(['npm', 'list', '-g', 'lighthouse'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output = result.stdout.decode('utf-8')
         if 'lighthouse@' in output:
-            print('Lighthouse Installed Globally')
             return True
         return False
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
 
+def is_browser_installed(browser_name):
+    return shutil.which(browser_name) is not None
 
 class Lighthouse:
     def __init__(self):
         # Check if the lighthouse cli package is installed locally
         if not is_lighthouse_installed_globally() and not is_lighthouse_installed_locally():
             raise Exception('Lighthouse package is not installed.\nPlease install it with `npm install -g lighthouse` or `npm install lighthouse`')
+
+        chrome_installed = is_browser_installed("chrome") or is_browser_installed("google-chrome")
+        chromium_installed = is_browser_installed("chromium") or is_browser_installed("chromium-browser")
+
+        # Check if chrome or chromium is installed
+        if not chrome_installed and not chromium_installed:
+            raise Exception('Chrome or Chromium is not installed.\nPlease install it and try again.')
 
         self.command = ['lighthouse']
         self.lighthouse_options = [
