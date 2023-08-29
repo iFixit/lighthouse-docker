@@ -8,19 +8,23 @@ load_dotenv()
 def retrieve_values_for_audits(json_results, audits):
    metrics = {}
    for audit in audits:
-        metrics[audit] = get_audits_value(json_results, audit)
+        metrics[audit] = [get_audits_value(json_results, audit), get_audits_score(json_results, audit)]
    return metrics
 
 def get_audits_value(json_results, audit_name):
     return json_results.get('audits').get(audit_name).get('numericValue') or 0
+
+def get_audits_score(json_results, audit_name):
+    return json_results.get('audits').get(audit_name).get('score') or 0
 
 def send_metrics_to_datadog(metrics, tags={}):
     tags = [f'{k}:{v}' for k, v in tags.items()]
 
     dd_client = DataDogApiClient()
 
-    for metric_name, value in metrics.items():
-        dd_client.submit_metric(f'lighthouse.{metric_name}', value, tags)
+    for metric_name, [value, score] in metrics.items():
+        dd_client.submit_metric(f'lighthouse.{metric_name}.value', value, tags)
+        dd_client.submit_metric(f'lighthouse.{metric_name}.score', score , tags)
 
 def capture_lighthouse_metrics(page_type, url, audits, lighthouse_options=[]):
     lighthouse = Lighthouse()
