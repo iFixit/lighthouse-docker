@@ -1,2 +1,0 @@
-datadog==0.45.0
-python-dotenv==1.0.0
