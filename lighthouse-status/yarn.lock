@@ -9325,6 +9325,13 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: 4983720b9abca930a4a46f18db163d7dad8dd00dbed6db0cc7b499b33b717cce69f80928b27bbb1ff2cbd3b19d251ee90669a8b5ea466072ca81c2ebe91e7468
+  languageName: node
+  linkType: hard
+
 "loglevel@npm:^1.6.6":
   version: 1.7.1
   resolution: "loglevel@npm:1.7.1"
@@ -9554,7 +9561,7 @@ fsevents@~2.1.2:
     "@types/node": ^14.14.10
     "@types/react": ^17.0.0
     "@types/react-dom": ^17.0.0
-    lodash: ^4.17.20
+    lodash: ^4.17.21
     luxon: ^1.28.1
     prop-types: ^15.7.2
     react: ^16.13.1
